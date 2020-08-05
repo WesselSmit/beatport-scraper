@@ -14,6 +14,8 @@
   "author": "Wessel Smit",
   "license": "MIT",
   "scripts": {
-    "start": "node scraper"
+    "start": "node scraper url=https://www.beatport.com/label/ophelia/68956/releases",
+    "test:ophelia": "node scraper url=https://www.beatport.com/label/ophelia/68956/releases",
+    "test:dimmak": "node scraper url=https://www.beatport.com/label/dim-mak-records/11919/releases"
   }
 }
