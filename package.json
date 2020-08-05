@@ -1,0 +1,19 @@
+{
+  "name": "beatport-scraper",
+  "version": "1.0.0",
+  "description": "",
+  "main": "scraper.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/WesselSmit/beatport-scraper.git"
+  },
+  "bugs": {
+    "url": "https://github.com/WesselSmit/beatport-scraper/issues"
+  },
+  "homepage": "https://github.com/WesselSmit/beatport-scraper#readme",
+  "author": "Wessel Smit",
+  "license": "MIT",
+  "scripts": {
+    "start": "node scraper"
+  }
+}
