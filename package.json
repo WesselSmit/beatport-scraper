@@ -1,21 +1,19 @@
 {
-  "name": "beatport-scraper",
-  "version": "1.0.0",
-  "description": "",
-  "main": "scraper.js",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/WesselSmit/beatport-scraper.git"
-  },
-  "bugs": {
-    "url": "https://github.com/WesselSmit/beatport-scraper/issues"
-  },
-  "homepage": "https://github.com/WesselSmit/beatport-scraper#readme",
-  "author": "Wessel Smit",
-  "license": "MIT",
-  "scripts": {
-    "start": "node scraper url=https://www.beatport.com/label/ophelia/68956/releases",
-    "test:ophelia": "node scraper url=https://www.beatport.com/label/ophelia/68956/releases",
-    "test:dimmak": "node scraper url=https://www.beatport.com/label/dim-mak-records/11919/releases"
-  }
+    "name": "beatport-scraper",
+    "version": "1.0.0",
+    "description": "",
+    "main": "scraper.js",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/WesselSmit/beatport-scraper.git"
+    },
+    "bugs": {
+        "url": "https://github.com/WesselSmit/beatport-scraper/issues"
+    },
+    "homepage": "https://github.com/WesselSmit/beatport-scraper#readme",
+    "author": "Wessel Smit",
+    "license": "MIT",
+    "scripts": {
+        "start": "node test"
+    }
 }

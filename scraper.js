@@ -1,15 +1,12 @@
-const args = process.argv.slice(2)
-const select = require('./modules/selectors')
 const log = require('./modules/logger')
+const select = require('./modules/selectors')
 
-const accURL = args[0]
+let config
 
+module.exports = configObj => {
+    config = configObj
 
+    console.log(config)
 
-module.exports = main()
-
-
-
-function main() {
-	console.log('begin')
+    log(`started for URL: ${config.url}`)
 }
