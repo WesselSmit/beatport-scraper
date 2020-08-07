@@ -2,12 +2,16 @@ const scraper = require('./scraper')
 
 
 
-// Ophelia (args)
+// Ophelia 
 const ophelia = 'https://www.beatport.com/label/ophelia/68956/releases'
 
 
-// Dimmak (args)
+// Dimmak 
 const dimmak = 'https://www.beatport.com/label/dim-mak-records/11919/releases'
+
+
+// Pegboard Nerds 
+const pegboardNerds = 'https://www.beatport.com/artist/pegboard-nerds/241813/releases'
 
 
 
