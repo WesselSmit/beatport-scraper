@@ -14,13 +14,12 @@
 module.exports = {
     //! All selectors are subject to change
 
-    /* Container element of pagination links.
-
-       NOTE: Beatports current website has a top and bottom pagination, both are identical.
-       Which results in an array containing 2 pagination-container elements. */
+    // Container element of pagination links
     paginationContainer: '.pagination-container',
 
+    // Pagination links 
+    paginationLink: 'a.pag-number',
 
-    /* Pagination Links */
-    paginationLinks: 'a.pag-number'
+    // Release detail page link
+    releaseLink: 'p.buk-horz-release-title > a'
 }

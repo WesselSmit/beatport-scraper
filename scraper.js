@@ -14,18 +14,22 @@ const select = require('./modules/selectors')
 const { interpolate } = require('./modules/utils')
 
 
+//todo Check if @returns {object} is still correct when the scraper is done bacuase it might change in development
 /**
  * Scrape content from a Beatports account
- * @param {object} bpAccURL - Beatport account URL
+ * @param {string} bpAccURL - Beatport account URL
  * @returns {object} - Scraped Beatport data
  */
 
 module.exports = async bpAccURL => {
-    log(`starting for url: ${bpAccURL}`)
+    log(`starting for ${bpAccURL}`)
 
     const releaseListURLs = await getReleaseListURLs(bpAccURL)
+    const releaseURLs = await getReleaseURLs(releaseListURLs)
 
-    return releaseListURLs
+    log(`found ${releaseURLs.length} releases`)
+
+    return releaseURLs
 }
 
 
@@ -45,7 +49,7 @@ async function getReleaseListURLs(URL) {
     let URLs
 
     if (hasPagination) {
-        const pageLinkEls = elements(select.paginationLinks, firstReleaseListHTML)
+        const pageLinkEls = elements(select.paginationLink, firstReleaseListHTML)
         const lastPageLinkEl = pageLinkEls[pageLinkEls.length - 1]
         const lastPageLinkURL = attributes(lastPageLinkEl).href
 
@@ -62,6 +66,40 @@ async function getReleaseListURLs(URL) {
         const firstPageURL = `${URL}?${pageQuery}1`
         URLs = [firstPageURL]
     }
+
+    return URLs
+}
+
+
+
+
+/**
+ * Get all individual release page URLs of a beatport account
+ * @param {string[]} releaseListURLs - Release overview URLs
+ * @returns {string[]} - URLs of individual release pages
+ */
+
+async function getReleaseURLs(releaseListURLs) {
+    const releaseListObjs = await Promise.allSettled(
+        releaseListURLs.map(async URL => {
+            const releaseListHTML = await html(URL)
+            const releaseLinkEls = elements(select.releaseLink, releaseListHTML)
+
+            const releaseURLs = releaseLinkEls.map((id, el) => attributes(el).href)
+            return releaseURLs
+        }))
+
+    const bpURL = 'https://www.beatport.com'
+    const URLs = []
+
+    releaseListObjs.forEach(obj => {
+        const releaseListReleaseURLs = obj.value
+
+        releaseListReleaseURLs.map((id, URL) => {
+            const releaseAbsURL = bpURL + URL
+            URLs.push(releaseAbsURL)
+        })
+    })
 
     return URLs
 }
