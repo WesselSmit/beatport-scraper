@@ -7,7 +7,7 @@ const fetch = require('node-fetch')
  * @module document
  */
 
-module.exports = { exists, html, elements, attributes }
+module.exports = { exists, html, elements, attributes, text }
 
 
 
@@ -45,8 +45,8 @@ async function html(URL) {
 
 /**
  * Get elements matching selector from HTML
- * @param {string} selector - Selector to test for
- * @param {string} HTML - HTML to test selector against
+ * @param {string} selector - Element selector
+ * @param {string} HTML - HTML of webpage
  * @returns {object} - Elements data object
  */
 
@@ -67,4 +67,19 @@ function elements(selector, HTML) {
 function attributes(element) {
     const attributes = element.attribs
     return attributes
+}
+
+
+
+
+/**
+ * Get textContent of first element matching selector
+ * @param {string} selector - Element selector
+ * @param {string} HTML - HTML of webpage
+ * @returns {string} - Text content of element
+ */
+
+function text(selector, HTML) {
+    const text = $(selector, HTML).first().text()
+    return text
 }

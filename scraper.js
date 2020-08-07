@@ -9,7 +9,7 @@
 
 
 const log = require('./modules/logger')
-const { html, exists, elements, attributes } = require('./modules/document')
+const { html, exists, elements, attributes, text } = require('./modules/document')
 const select = require('./modules/selectors')
 const { interpolate } = require('./modules/utils')
 
@@ -18,7 +18,7 @@ const { interpolate } = require('./modules/utils')
 /**
  * Scrape content from a Beatports account
  * @param {string} bpAccURL - Beatport account URL
- * @returns {object} - Scraped Beatport data
+ * @returns {object[]} - Scraped Beatport data
  */
 
 module.exports = async bpAccURL => {
@@ -27,9 +27,10 @@ module.exports = async bpAccURL => {
     const releaseListURLs = await getReleaseListURLs(bpAccURL)
     const releaseURLs = await getReleaseURLs(releaseListURLs)
 
-    log(`found ${releaseURLs.length} releases`)
+    log(`scraping ${releaseURLs.length} releases`)
 
-    return releaseURLs
+    const content = await getContent(releaseURLs)
+    return content
 }
 
 
@@ -102,4 +103,42 @@ async function getReleaseURLs(releaseListURLs) {
     })
 
     return URLs
+}
+
+
+
+
+/**
+ * Get content of individual release pages 
+ * @param {string[]} releaseURLs - Individual release URLs
+ * @returns {object[]} - Scraped release content
+ */
+
+async function getContent(releaseURLs) {
+    const contentObjs = await Promise.allSettled(
+        releaseURLs.map(async URL => {
+            const HTML = await html(URL)
+
+            const releasesOnPage = elements(select.releaseItem, HTML)
+            const isSingleRelease = releasesOnPage.length === 1 ? true : false
+
+            //todo Depending whether 'isSingleRelease' the content needs to be transformed into a object
+            // if (!isSingleRelease) {
+            //     console.log(URL)
+            // }
+
+            // const releaseContent = {
+            //     url: URL,
+            //     catalog: text(select.catalog, HTML),
+            //     releaseDate: text(select.releaseDate, HTML),
+            //     label: text(select.label, HTML),
+            //     genre: text(select.genre, HTML),
+            //     bpm: text(select.bpm, HTML),
+            //     price: text(select.price, HTML)
+            // }
+            // return await releaseContent
+        }))
+
+    const content = contentObjs.map(obj => obj.value)
+    return content
 }
