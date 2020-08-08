@@ -138,6 +138,7 @@ async function getContent(releaseURLs) {
                 genre: text(select.genre, HTML),
                 bpm: text(select.bpm, HTML),
                 price: text(select.price, HTML)
+                //todo Add individual beatport release ID, it's a data attrbitute on the release <li> 
             }
 
             //todo The releaseContent metadata might be easier to retrieve by scraping the data-attributes of the release li
