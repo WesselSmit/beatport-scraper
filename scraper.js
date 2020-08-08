@@ -30,6 +30,11 @@ module.exports = async bpAccURL => {
     log(`scraping ${releaseURLs.length} releases`)
 
     const content = await getContent(releaseURLs)
+
+    //todo Use this to find all different types And then make a function that strips all artist names from the type 
+    // content.forEach(item => console.log(item.type))
+
+
     return content
 }
 
@@ -116,13 +121,18 @@ async function getReleaseURLs(releaseListURLs) {
 
 async function getContent(releaseURLs) {
     const contentObjs = await Promise.allSettled(
-        releaseURLs.map(async URL => {
+        releaseURLs.map(async (URL, i) => {
             const HTML = await html(URL)
+            log(`scraping ${URL}`)
 
             const releaseContent = {
-                url: URL,
                 catalog: text(select.catalog, HTML),
+                url: URL,
+                title: text(select.title,
+                HTML), //todo still has some weirdly formatted titles with duplicate artists names, artist names need to be revmoed
+                coverArt: attr('src', elems(select.coverArt, HTML)[0]),
                 releaseDate: text(select.releaseDate, HTML),
+                type: text(select.type, HTML), //todo artist names need to be removed
                 label: text(select.label, HTML),
                 genre: text(select.genre, HTML),
                 bpm: text(select.bpm, HTML),

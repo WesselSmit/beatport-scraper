@@ -45,6 +45,14 @@ module.exports = {
     price: '.add-to-default',
 
     // Length
-    duration: '.buk-track-length > a'
+    duration: '.buk-track-length > a',
 
+    // Cover art
+    coverArt: '.interior-release-chart-artwork.interior-release-chart-artwork--desktop',
+
+    // Title
+    title: '.interior-release-chart-content > h1',
+
+    // Type
+    type: '.buk-track-remixed'
 }
