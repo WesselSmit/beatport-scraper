@@ -18,6 +18,6 @@ const pegboardNerds = 'https://www.beatport.com/artist/pegboard-nerds/241813/rel
 
 test()
 async function test() {
-    const data = await scraper(dimmak)
+    const data = await scraper(ophelia)
     console.log(data)
 }

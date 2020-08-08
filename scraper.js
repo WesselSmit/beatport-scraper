@@ -9,7 +9,7 @@
 
 
 const log = require('./modules/logger')
-const { html, exists, elements, attributes, text } = require('./modules/document')
+const { exists, html, elems, attr, text } = require('./modules/document')
 const select = require('./modules/selectors')
 const { interpolate } = require('./modules/utils')
 
@@ -50,9 +50,9 @@ async function getReleaseListURLs(URL) {
     let URLs
 
     if (hasPagination) {
-        const pageLinkEls = elements(select.paginationLink, firstReleaseListHTML)
+        const pageLinkEls = elems(select.paginationLink, firstReleaseListHTML)
         const lastPageLinkEl = pageLinkEls[pageLinkEls.length - 1]
-        const lastPageLinkURL = attributes(lastPageLinkEl).href
+        const lastPageLinkURL = attr('href', lastPageLinkEl)
 
         const lastPageNumStr = lastPageLinkURL.split(pageQuery)[1]
         const lastPageNumInt = parseInt(lastPageNumStr, 10)
@@ -84,9 +84,9 @@ async function getReleaseURLs(releaseListURLs) {
     const releaseListObjs = await Promise.allSettled(
         releaseListURLs.map(async URL => {
             const releaseListHTML = await html(URL)
-            const releaseLinkEls = elements(select.releaseLink, releaseListHTML)
+            const releaseLinkEls = elems(select.releaseLink, releaseListHTML)
 
-            const releaseURLs = releaseLinkEls.map((id, el) => attributes(el).href)
+            const releaseURLs = releaseLinkEls.map((id, el) => attr('href', el))
             return releaseURLs
         }))
 
@@ -119,24 +119,26 @@ async function getContent(releaseURLs) {
         releaseURLs.map(async URL => {
             const HTML = await html(URL)
 
-            const releasesOnPage = elements(select.releaseItem, HTML)
+            const releaseContent = {
+                url: URL,
+                catalog: text(select.catalog, HTML),
+                releaseDate: text(select.releaseDate, HTML),
+                label: text(select.label, HTML),
+                genre: text(select.genre, HTML),
+                bpm: text(select.bpm, HTML),
+                price: text(select.price, HTML)
+            }
+
+            const releasesOnPage = elems(select.releaseItem, HTML)
             const isSingleRelease = releasesOnPage.length === 1 ? true : false
 
-            //todo Depending whether 'isSingleRelease' the content needs to be transformed into a object
-            // if (!isSingleRelease) {
-            //     console.log(URL)
-            // }
+            if (!isSingleRelease) {
+                //todo Make a releaseContent obj for each sub release
+                //todo Push all sub release releaseContent objs to a array
+                //todo Add the array as a property to the main releaseContent which gets returned in the function
+            }
 
-            // const releaseContent = {
-            //     url: URL,
-            //     catalog: text(select.catalog, HTML),
-            //     releaseDate: text(select.releaseDate, HTML),
-            //     label: text(select.label, HTML),
-            //     genre: text(select.genre, HTML),
-            //     bpm: text(select.bpm, HTML),
-            //     price: text(select.price, HTML)
-            // }
-            // return await releaseContent
+            return await releaseContent
         }))
 
     const content = contentObjs.map(obj => obj.value)

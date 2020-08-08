@@ -7,7 +7,7 @@ const fetch = require('node-fetch')
  * @module document
  */
 
-module.exports = { exists, html, elements, attributes, text }
+module.exports = { exists, html, elems, attr, text }
 
 
 
@@ -50,7 +50,7 @@ async function html(URL) {
  * @returns {object} - Elements data object
  */
 
-function elements(selector, HTML) {
+function elems(selector, HTML) {
     const elements = $(selector, HTML)
     return elements
 }
@@ -59,14 +59,16 @@ function elements(selector, HTML) {
 
 
 /**
- * Get attributes of element
- * @param {object} element - Element to get attributes of
- * @returns {object} - Attribute key/value pairs
+ * Get specific attribute of element
+ * @param {string} attr - Attribute to get
+ * @param {object} element - Element to get attribute from
+ * @returns {string} - Attribute value
  */
 
-function attributes(element) {
+function attr(attr, element) {
     const attributes = element.attribs
-    return attributes
+    const attribute = attributes[attr]
+    return attribute
 }
 
 
