@@ -129,7 +129,8 @@ async function getContent(releaseURLs) {
                 catalog: text(select.catalog, HTML),
                 url: URL,
                 title: text(select.title,
-                HTML), //todo still has some weirdly formatted titles with duplicate artists names, artist names need to be revmoed
+                    HTML
+                ), //todo still has some weirdly formatted titles with duplicate artists names, artist names need to be revmoed
                 coverArt: attr('src', elems(select.coverArt, HTML)[0]),
                 releaseDate: text(select.releaseDate, HTML),
                 type: text(select.type, HTML), //todo artist names need to be removed
@@ -138,6 +139,14 @@ async function getContent(releaseURLs) {
                 bpm: text(select.bpm, HTML),
                 price: text(select.price, HTML)
             }
+
+            //todo The releaseContent metadata might be easier to retrieve by scraping the data-attributes of the release li
+            /* Example:
+			<li class="bucket-item ec-item track" data-ec-position="1" data-ec-type="product" 
+			data-ec-name="Calling You Home (feat. RUNN) feat. RUNN" data-ec-creative="Release Track Listing" 
+			data-ec-brand="Ophelia" data-ec-category="Tracks" data-ec-list="Release Track Listing" 
+			data-ec-price="1.29" data-ec-variant="track" data-ec-id="10361039"
+			data-ec-d1="Seven Lions, RUNN" data-ec-d2="Oliver Smith" data-ec-d3="Trance"> */
 
             const releasesOnPage = elems(select.releaseItem, HTML)
             const isSingleRelease = releasesOnPage.length === 1 ? true : false
