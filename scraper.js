@@ -41,6 +41,7 @@ module.exports = async bpAccURL => {
     // choose between minimal and extensive logging (param in config)
     // smart url checking: check if url is of account or release page --> give smart feedback when url is wrong
     // raw VS smart --> only scraped content or use functions to guess the content: eg. 'type' property; 'au5 Remix' or 'remix' (param in config)
+    // data-helper functions that get specific data information (eg. get all artists)
 
     return content
 }
