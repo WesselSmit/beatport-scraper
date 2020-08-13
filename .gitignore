@@ -9,3 +9,6 @@ data
 
 # Simulated test file
 test.js
+
+# Code formatter config
+.jsbeautifyrc
