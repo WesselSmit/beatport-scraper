@@ -1,4 +1,4 @@
-/* This package is used to scrape content from beatport.
+/* This package is used to scrape content from Beatport.
    To scrape a website you have to rely on the DOM structure,
    the DOM structure of a website is bound to change at some point,
    which will break the scraper code and result in errors. 
@@ -27,7 +27,11 @@ module.exports = scraper
 
 
 
-//todo Add JSdoc
+/**
+ * Facilitate scraping process and log progress
+ * @param {object} conf - Config options
+ * @returns {object} - Scraped data
+ */
 
 async function scraper(conf) {
     config = conf
@@ -55,10 +59,13 @@ async function scraper(conf) {
 
 
 
-//todo Add JSdoc
+/**
+ * Get HTML pages that need to be scraped 
+ * @returns {object[]} - Response objects containing stringified HTML pages
+ */
 
 async function getPages() {
-    const pageBaseURL = getPageURL()
+    const pageBaseURL = getBaseURL()
     const firstPageURL = pageBaseURL + 1
     const firstPageHTML = await html(firstPageURL)
     const hasPagination = exists(select.paginationContainer, firstPageHTML)
@@ -83,9 +90,12 @@ async function getPages() {
 
 
 
-//todo Add JSdoc
+/**
+ * Get base URL of web page to scrape for content
+ * @returns {string} - Beatport account content base URL
+ */
 
-function getPageURL() {
+function getBaseURL() {
     const baseURL = padEndSlash(config.accountURL)
     const pageQuery = '?page='
     const pageURL = baseURL + config.contentType + pageQuery
@@ -97,9 +107,9 @@ function getPageURL() {
 
 
 /**
- * Get
- * @param {*} HTML -
- * @returns {} - 
+ * Get first and last page number of Beatport account 'contentType' page by scraping pagination link elements
+ * @param {string} HTML - Stringified HTML
+ * @returns {number[]} - Page numbers
  */
 
 function getPageNums(HTML) {
@@ -119,7 +129,7 @@ function getPageNums(HTML) {
 
 
 /**
- * Get JSON data from inline script tag and remove all JS
+ * Scrape JSON data from inline script tag and remove all JS
  * @param {object[]} HTMLPages - Stringified HTML pages
  * @returns {object[]} - Response objects including stringified JSON data
  */
@@ -131,7 +141,7 @@ async function getData(HTMLPages) {
             const scriptEl = elems(select.dataInlineScript, HTML)
             const js = scriptEl.first().html()
 
-            const json = js.split('=')[2].split(';')[0]
+            const json = js.split('=')[2].split(';')[0] //! Subject to change
             return json
         }))
 
@@ -141,7 +151,11 @@ async function getData(HTMLPages) {
 
 
 
-//todo Add JSdoc
+/**
+ * Get rid of fetch status and transform JSON to JS object
+ * @param {object[]} dataArr - Response objects including stringified JSON data
+ * @returns {object[]} - Sanitized JSON data
+ */
 
 function sanitizeData(dataArr) {
     const mergedData = dataArr.map(json => {
