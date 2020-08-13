@@ -1,6 +1,6 @@
 const { log, checkPermission } = require('./modules/logger')
-const { padSlash, interpolate } = require('./modules/utils')
-const { exists, html, elems, attr } = require('./modules/document')
+const { padEndSlash, interpolate } = require('./modules/utils')
+const { html, exists, elems, attr } = require('./modules/document')
 const select = require('./modules/selectors')
 
 let config
@@ -74,7 +74,7 @@ async function getPages() {
 //todo Add JSdoc
 
 function getPageURL() {
-    const baseURL = padSlash(config.accountURL)
+    const baseURL = padEndSlash(config.accountURL)
     const pageQuery = '?page='
     const pageURL = baseURL + config.contentType + pageQuery
 

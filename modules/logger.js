@@ -1,5 +1,5 @@
 /**
- * Log progress of scraper
+ * Log and log-utility functions
  * @module logger
  */
 
@@ -23,7 +23,11 @@ function log(str) {
 
 
 
-//todo Add JSdoc
+/**
+ * Check if scraper has permission to log according to config
+ * @param {object} config - Config / scraper parameters
+ * @param {int} lvl - Minimum logLevel required to log message
+ */
 
 function checkPermission(config, lvl) {
     if (config.logLevel && config.logLevel >= lvl) {

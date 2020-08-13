@@ -3,27 +3,11 @@ const fetch = require('node-fetch')
 
 
 /**
- * HTML extraction functions
+ * HTML / DOM manipulative functions
  * @module document
  */
 
-module.exports = { exists, html, elems, attr }
-
-
-
-
-/**
- * Test if HTML contains atleast one element matching the selector
- * @param {string} selector - Selector to test for
- * @param {string} HTML - HTML to test selector against
- * @returns {boolean} - Bool indicating if HTML contains element matching selector
- */
-
-function exists(selector, HTML) {
-    const elementsArr = $(selector, HTML)
-    const exists = elementsArr.length > 0 ? true : false
-    return exists
-}
+module.exports = { html, exists, elems, attr }
 
 
 
@@ -37,6 +21,7 @@ function exists(selector, HTML) {
 async function html(URL) {
     const res = await fetch(URL)
     const HTML = await res.text()
+
     return HTML
 }
 
@@ -44,14 +29,32 @@ async function html(URL) {
 
 
 /**
- * Get elements matching selector from HTML
+ * Check if element exists in DOM
  * @param {string} selector - Element selector
- * @param {string} HTML - HTML of webpage
- * @returns {object} - Elements data object
+ * @param {string} HTML - Stringified HTML
+ * @returns {boolean} - Existance of element in DOM
+ */
+
+function exists(selector, HTML) {
+    const elementsArr = $(selector, HTML)
+    const exists = elementsArr.length > 0 ? true : false
+
+    return exists
+}
+
+
+
+
+/**
+ * Get elements from DOM
+ * @param {string} selector - Element selector
+ * @param {string} HTML - Stringified HTML
+ * @returns {object} - Element metadata objects
  */
 
 function elems(selector, HTML) {
     const elements = $(selector, HTML)
+
     return elements
 }
 
@@ -60,13 +63,14 @@ function elems(selector, HTML) {
 
 /**
  * Get specific attribute of element
- * @param {string} attr - Attribute to get
- * @param {object} element - Element to get attribute from
+ * @param {string} attr - Attribute 
+ * @param {object} element - Element metadata object
  * @returns {string} - Attribute value
  */
 
 function attr(attr, element) {
     const attributes = element.attribs
     const attribute = attributes[attr]
+
     return attribute
 }
