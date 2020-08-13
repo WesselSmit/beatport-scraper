@@ -4,8 +4,8 @@
 # node_modules
 node_modules
 
-# environment variables 
-**/.env
-
 # Generated/Scraped data
 data
+
+# Simulated test file
+test.js
