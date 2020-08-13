@@ -1,3 +1,12 @@
+/* This package is used to scrape content from beatport.
+   To scrape a website you have to rely on the DOM structure,
+   the DOM structure of a website is bound to change at some point,
+   which will break the scraper code and result in errors. 
+   
+   MAINTENANCE: if the script is broken, the recommended first step is to;
+   check if the selectors in './modules/selectors.js' are still valid. */
+
+
 const { log, checkPermission } = require('./modules/logger')
 const { padEndSlash, interpolate } = require('./modules/utils')
 const { html, exists, elems, attr } = require('./modules/document')
@@ -8,7 +17,10 @@ let config
 
 
 
-//todo Add JSdoc
+/**
+ * Get content of Beatport account
+ * @module scraper
+ */
 
 module.exports = scraper
 
@@ -84,7 +96,11 @@ function getPageURL() {
 
 
 
-//todo Add JSdoc
+/**
+ * Get
+ * @param {*} HTML -
+ * @returns {} - 
+ */
 
 function getPageNums(HTML) {
     const pageLinkEls = elems(select.paginationLink, HTML)
@@ -102,16 +118,20 @@ function getPageNums(HTML) {
 
 
 
-//todo Add JSdoc
+/**
+ * Get JSON data from inline script tag and remove all JS
+ * @param {object[]} HTMLPages - Stringified HTML pages
+ * @returns {object[]} - Response objects including stringified JSON data
+ */
 
 async function getData(HTMLPages) {
     const dataArr = await Promise.allSettled(
         HTMLPages.map(async pageObj => {
             const HTML = pageObj.value
             const scriptEl = elems(select.dataInlineScript, HTML)
-            const scriptElContent = scriptEl.first().html()
+            const js = scriptEl.first().html()
 
-            const json = scriptElContent.split('=')[2].split(';')[0]
+            const json = js.split('=')[2].split(';')[0]
             return json
         }))
 
@@ -124,13 +144,10 @@ async function getData(HTMLPages) {
 //todo Add JSdoc
 
 function sanitizeData(dataArr) {
-    const data = []
-
-    const a = dataArr.map(json => {
+    const mergedData = dataArr.map(json => {
         const obj = JSON.parse(json.value)
-        data.push(obj)
         return obj
     })
 
-    return a
+    return mergedData
 }
