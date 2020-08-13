@@ -7,7 +7,7 @@
    check if the selectors in './modules/selectors.js' are still valid. */
 
 
-const { log, checkPermission } = require('./modules/logger')
+const { log, updateLog } = require('./modules/logger')
 const { padEndSlash, interpolate } = require('./modules/utils')
 const { html, exists, elems, attr } = require('./modules/document')
 const select = require('./modules/selectors')
@@ -36,20 +36,20 @@ module.exports = scraper
 async function scraper(conf) {
     config = conf
 
-    if (checkPermission(config, 1)) {
+    if (config.logging) {
         log(`starting scraping`)
     }
 
     const HTMLPages = await getPages()
 
-    if (checkPermission(config, 2)) {
+    if (config.logging) {
         log(`found ${HTMLPages.length} ${HTMLPages.length > 1 ? "pages" : "page"}`)
     }
 
     const dataArr = await getData(HTMLPages)
     const data = sanitizeData(dataArr)
 
-    if (checkPermission(config, 1)) {
+    if (config.logging) {
         log(`finished scraping`)
     }
 
@@ -77,6 +77,7 @@ async function getPages() {
             pageNums.map(async num => {
                 const pageURL = pageBaseURL + num
                 const pageHTML = await html(pageURL)
+
                 return pageHTML
             })
         )
@@ -136,12 +137,17 @@ function getPageNums(HTML) {
 
 async function getData(HTMLPages) {
     const dataArr = await Promise.allSettled(
-        HTMLPages.map(async pageObj => {
+        HTMLPages.map(async (pageObj, i) => {
             const HTML = pageObj.value
             const scriptEl = elems(select.dataInlineScript, HTML)
             const js = scriptEl.first().html()
-
             const json = js.split('=')[2].split(';')[0] //! Subject to change
+
+            if (config.logging) {
+                const isLast = (i === HTMLPages.length - 1) ? true : false
+                updateLog(`done scraping page ${i + 1}/${HTMLPages.length}`, isLast)
+            }
+
             return json
         }))
 
@@ -160,6 +166,7 @@ async function getData(HTMLPages) {
 function sanitizeData(dataArr) {
     const mergedData = dataArr.map(json => {
         const obj = JSON.parse(json.value)
+
         return obj
     })
 

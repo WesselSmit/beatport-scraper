@@ -1,38 +1,59 @@
+const readline = require('readline')
+
+
 /**
  * Log and log-utility functions
  * @module logger
  */
 
-module.exports = { log, checkPermission }
+module.exports = { log, updateLog }
 
 
 
 
 /**
- * Special print scraper specific logs 
+ * Print formatted logs with newline for scraper specific logs
  * @param {string} str - String to print
  */
 
 function log(str) {
-    /* '\x1b[32m' is the print color,
-       '%s\x1b[0m' is the reset code and ensures the next logs don't inherit the print color. */
-    const color = '\x1b[32m%s\x1b[0m'
-    console.log(color, `[scraper] ${str}`)
+    process.stdout.write(color(`[scraper] ${str}\n`))
 }
 
 
 
 
 /**
- * Check if scraper has permission to log according to config
- * @param {object} config - Config / scraper parameters
- * @param {int} lvl - Minimum logLevel required to log message
+ * Replace previous print message with updated message
+ * @param {string} str - String to print
+ * @param {boolean} last - String is last string in loop
  */
 
-function checkPermission(config, lvl) {
-    if (config.logLevel && config.logLevel >= lvl) {
-        return true
+function updateLog(str, last) {
+    readline.clearLine(process.stdout)
+    readline.cursorTo(process.stdout, 0)
+    if (last) {
+        log(str)
     } else {
-        return false
+        process.stdout.write(color(`[scraper] ${str}`))
     }
+}
+
+
+
+
+/**
+ * Add color codes to messages to print in color
+ * @param {string} str - Message to print
+ * @returns {string} - Message containing color codes
+ */
+
+function color(str) {
+    /* '\x1b[32m' is the print color,
+       '\x1b[0m' is the reset code and ensures the next logs don't inherit the print color. */
+    const color = "\x1b[32m"
+    const resetColor = "\x1b[0m"
+    const printStr = [color, str, resetColor].join('')
+
+    return printStr
 }
