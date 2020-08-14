@@ -47,7 +47,7 @@ async function scraper(conf) {
     }
 
     const dataArr = await getData(HTMLPages)
-    const data = sanitizeData(dataArr)
+    const data = await sanitizeData(dataArr)
 
     if (config.logging) {
         log(`finished scraping`)
@@ -61,7 +61,7 @@ async function scraper(conf) {
 
 /**
  * Get HTML pages that need to be scraped 
- * @returns {object[]} - Response objects containing stringified HTML pages
+ * @returns {string[]} - Stringified HTML pages
  */
 
 async function getPages() {
@@ -73,7 +73,7 @@ async function getPages() {
     let HTMLPages
     if (hasPagination) {
         const pageNums = getPageNums(firstPageHTML)
-        HTMLPages = await Promise.allSettled(
+        HTMLPageObjs = await Promise.allSettled(
             pageNums.map(async num => {
                 const pageURL = pageBaseURL + num
                 const pageHTML = await html(pageURL)
@@ -81,6 +81,7 @@ async function getPages() {
                 return pageHTML
             })
         )
+        HTMLPages = HTMLPageObjs.map(pageObj => pageObj.value)
     } else {
         HTMLPages = [firstPageHTML]
     }
@@ -137,8 +138,7 @@ function getPageNums(HTML) {
 
 async function getData(HTMLPages) {
     const dataArr = await Promise.allSettled(
-        HTMLPages.map(async (pageObj, i) => {
-            const HTML = pageObj.value
+        HTMLPages.map(async (HTML, i) => {
             const scriptEl = elems(select.dataInlineScript, HTML)
             const js = scriptEl.first().html()
             const json = js.split('=')[2].split(';')[0] //! Subject to change
@@ -163,12 +163,13 @@ async function getData(HTMLPages) {
  * @returns {object[]} - Sanitized JSON data
  */
 
-function sanitizeData(dataArr) {
-    const mergedData = dataArr.map(json => {
-        const obj = JSON.parse(json.value)
+async function sanitizeData(dataArr) {
+    const mergedData = await Promise.allSettled(
+        dataArr.map(async json => {
+            const obj = JSON.parse(json.value)
 
-        return obj
-    })
+            return obj
+    }))
 
     return mergedData
 }
