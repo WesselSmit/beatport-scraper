@@ -73,7 +73,7 @@ async function getPages() {
     let HTMLPages
     if (hasPagination) {
         const pageNums = getPageNums(firstPageHTML)
-        HTMLPageObjs = await Promise.allSettled(
+        const HTMLPageObjs = await Promise.allSettled(
             pageNums.map(async num => {
                 const pageURL = pageBaseURL + num
                 const pageHTML = await html(pageURL)
@@ -141,7 +141,10 @@ async function getData(HTMLPages) {
         HTMLPages.map(async (HTML, i) => {
             const scriptEl = elems(select.dataInlineScript, HTML)
             const js = scriptEl.first().html()
-            const json = js.split('=')[2].split(';')[0] //! Subject to change
+
+            const startJSONIndicator = "window.Playables = " //! Subject to change
+            const endJSONIndicator = "window.Sliders =" //! Subject to change
+            const json = js.split(startJSONIndicator)[1].split(endJSONIndicator)[0]
 
             if (config.logging) {
                 const isLast = (i === HTMLPages.length - 1) ? true : false
@@ -149,7 +152,8 @@ async function getData(HTMLPages) {
             }
 
             return json
-        }))
+        })
+    )
 
     return dataArr
 }
@@ -166,10 +170,13 @@ async function getData(HTMLPages) {
 async function sanitizeData(dataArr) {
     const mergedData = await Promise.allSettled(
         dataArr.map(async json => {
-            const obj = JSON.parse(json.value)
+            const jsonEndCharSequence = ";\n"
+            const jsonTrimmed = json.value.split(jsonEndCharSequence)[0]
+            const obj = JSON.parse(jsonTrimmed)
 
             return obj
-    }))
+        })
+    )
 
     return mergedData
 }
