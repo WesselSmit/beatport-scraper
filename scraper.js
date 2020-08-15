@@ -36,6 +36,14 @@ module.exports = scraper
 async function scraper(conf) {
     config = conf
 
+    if (config.contentType === "featured") {
+        config.contentTypeURL = ""
+    } else {
+        config.contentTypeURL = config.contentType
+    }
+
+    console.log(`type = ${config.contentType},   used = ${config.contentTypeURL}`)
+
     if (config.logging) {
         log(`starting scraping`)
     }
@@ -100,7 +108,7 @@ async function getPages() {
 function getBaseURL() {
     const baseURL = padEndSlash(config.accountURL)
     const pageQuery = '?page='
-    const pageURL = baseURL + config.contentType + pageQuery
+    const pageURL = baseURL + config.contentTypeURL + pageQuery
 
     return pageURL
 }
@@ -109,7 +117,7 @@ function getBaseURL() {
 
 
 /**
- * Get first and last page number of Beatport account 'contentType' page by scraping pagination link elements
+ * Get first and last page number of Beatport account 'contentTypeURL' page by scraping pagination link elements
  * @param {string} HTML - Stringified HTML
  * @returns {number[]} - Page numbers
  */
