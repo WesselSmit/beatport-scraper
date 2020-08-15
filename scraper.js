@@ -42,8 +42,6 @@ async function scraper(conf) {
         config.contentTypeURL = config.contentType
     }
 
-    console.log(`type = ${config.contentType},   used = ${config.contentTypeURL}`)
-
     if (config.logging) {
         log(`starting scraping`)
     }
