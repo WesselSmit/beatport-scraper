@@ -37,9 +37,6 @@ const data = await scraper(config)
 console.log(data)
 ```
 
-Recommended use is to store data as a JSON file.
-
-
 ## Disclaimer
 
 The nature of web scraping is that when the HTML/website changes, the web scraper will inevitably fail. 
