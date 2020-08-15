@@ -1,8 +1,12 @@
 {
     "name": "beatport-scraper",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "description": "Scraper for Beatport data",
-    "keywords": ["beatport", "scraper", "music"],
+    "keywords": [
+        "beatport",
+        "scraper",
+        "music"
+    ],
     "main": "scraper.js",
     "repository": {
         "type": "git",
