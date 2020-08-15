@@ -170,13 +170,14 @@ async function getData(HTMLPages) {
 async function sanitizeData(dataArr) {
     const mergedData = await Promise.allSettled(
         dataArr.map(async json => {
-            const jsonEndCharSequence = ";\n"
+            const jsonEndCharSequence = ";\n" //! Subject to change
             const jsonTrimmed = json.value.split(jsonEndCharSequence)[0]
             const obj = JSON.parse(jsonTrimmed)
 
             return obj
         })
     )
+    const sanitizedData = mergedData.map(json => json.value)
 
-    return mergedData
+    return sanitizedData
 }
