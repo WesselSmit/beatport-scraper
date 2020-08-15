@@ -36,23 +36,26 @@ module.exports = scraper
 async function scraper(conf) {
     config = conf
 
-    if (config.contentType === "featured") {
-        config.contentTypeURL = ""
-    } else {
-        config.contentTypeURL = config.contentType
-    }
+    /* Format contentType to usable contentTypeURL,
+       this is to allow users to specify 'featured' instead of '' as config.contentType */
+    config.contentTypeURL = (config.contentType === "featured") ? "" : config.contentType
+
 
     if (config.logging) {
         log(`starting scraping`)
     }
 
+    // Traverse Beatport account and get HTML of all pages
     const HTMLPages = await getPages()
 
     if (config.logging) {
         log(`found ${HTMLPages.length} ${HTMLPages.length > 1 ? "pages" : "page"}`)
     }
 
+    // Scrape content of HTML pages
     const dataArr = await getData(HTMLPages)
+
+    // Sanitize data to get rid of repsonse objects from cheerio/node-fetch
     const data = await sanitizeData(dataArr)
 
     if (config.logging) {
@@ -71,6 +74,7 @@ async function scraper(conf) {
  */
 
 async function getPages() {
+    // Get first page HTML to analyse for pagination
     const pageBaseURL = getBaseURL()
     const firstPageURL = pageBaseURL + 1
     const firstPageHTML = await html(firstPageURL)
@@ -121,6 +125,7 @@ function getBaseURL() {
  */
 
 function getPageNums(HTML) {
+    // Traverse pagination and get all page URLs
     const pageLinkEls = elems(select.paginationLink, HTML)
     const lastPageLinkEl = pageLinkEls[pageLinkEls.length - 1]
     const lastPageLinkRelURL = attr('href', lastPageLinkEl)
@@ -148,6 +153,11 @@ async function getData(HTMLPages) {
             const scriptEl = elems(select.dataInlineScript, HTML)
             const js = scriptEl.first().html()
 
+            /* Beatport stores the data in JSON format as the value of a JS variable in an inline script tag,
+               the content of the entire inline script tag is stored in 'js',
+               the JS needs to be removed from 'js', to do this; the hardcoded JS before and after the JSON is stored 
+               in 'start/endJSONinsidctor', these variables are then used to onlt get the JSON from the string.
+               Without removing the JS JSON.stringify() will throw errors */
             const startJSONIndicator = "window.Playables = " //! Subject to change
             const endJSONIndicator = "window.Sliders =" //! Subject to change
             const json = js.split(startJSONIndicator)[1].split(endJSONIndicator)[0]
@@ -176,6 +186,9 @@ async function getData(HTMLPages) {
 async function sanitizeData(dataArr) {
     const mergedData = await Promise.allSettled(
         dataArr.map(async json => {
+            /* The received JSON is stringified and also has an second string only containing whitespace chars,
+               to remove the extra string we check for the 'jsonEndCharSequence' character sequence.
+               Without removing the extra string JSON.stringify() will throw errors. */
             const jsonEndCharSequence = ";\n" //! Subject to change
             const jsonTrimmed = json.value.split(jsonEndCharSequence)[0]
             const obj = JSON.parse(jsonTrimmed)
