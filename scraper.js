@@ -68,11 +68,25 @@ async function scraper(conf) {
         })
     )
 
+    const formattedContent = content.map((contentObj,i) => {
+        const type = contentObj.value.type
+        const data = contentObj.value.data
+
+        const deNestedObj = data.map(cluster => cluster[type])
+        const flattenedObj = deNestedObj.flat()
+
+        const obj = {
+            [type]: flattenedObj
+        }
+
+        return obj
+    })
+
     if (config.logging) {
         log(`finished scraping`)
     }
 
-    return content
+    return formattedContent
 }
 
 
