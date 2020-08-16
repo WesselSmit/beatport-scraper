@@ -68,19 +68,7 @@ async function scraper(conf) {
         })
     )
 
-    const formattedContent = content.map((contentObj,i) => {
-        const type = contentObj.value.type
-        const data = contentObj.value.data
-
-        const deNestedObj = data.map(cluster => cluster[type])
-        const flattenedObj = deNestedObj.flat()
-
-        const obj = {
-            [type]: flattenedObj
-        }
-
-        return obj
-    })
+    const formattedContent = formatData(content)
 
     if (config.logging) {
         log(`finished scraping`)
@@ -225,4 +213,31 @@ async function sanitizeData(dataArr) {
     const sanitizedData = mergedData.map(json => json.value)
 
     return sanitizedData
+}
+
+
+
+
+/**
+ * Format data to get rid of unnecesary nesting
+ * @param {object[]} content - Data to be formatted
+ * @returns {object[]} - Formatted data
+ */
+
+function formatData(content) {
+    const formattedData = content.map(contentObj => {
+        const type = contentObj.value.type
+        const data = contentObj.value.data
+
+        const deNestedObj = data.map(cluster => cluster[type])
+        const flattenedObj = deNestedObj.flat()
+
+        const obj = {
+            [type]: flattenedObj
+        }
+
+        return obj
+    })
+
+    return formattedData
 }
