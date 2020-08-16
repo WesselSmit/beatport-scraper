@@ -77,10 +77,50 @@ async function scraper(conf) {
     if (config.raw) {
         return formattedContent
     } else {
+
         if (config.logging) {
             log(`processing scraped data`)
-            // combine the scraped data
         }
+
+        //todo combine the scraped data
+
+        const uniqueIDs = [] // array of unique IDs (this is the same for both 'tracks' and 'releases')
+
+        formattedContent.map((data, i) => {
+
+            if (i === 0) { //tracks
+                const tracks = data.tracks
+                tracks.map((track, j) => {
+                    // console.log(j, track.release.id, track.name)
+
+
+                    const ID = track.release.id
+                    if (!uniqueIDs.includes(ID)) {
+                        uniqueIDs.push(ID)
+                    }
+                })
+            }
+
+            if (i === 1) { //releases
+                const releases = data.releases
+                releases.map((release, j) => {
+                    // console.log(j, release.id, release.name)
+
+
+                    const ID = release.id
+                    if (!uniqueIDs.includes(ID)) {
+                        uniqueIDs.push(ID)
+                    }
+                })
+            }
+
+            //todo: now that you have the uniqueIDs we can combine tracks and releases based on the ID
+            //todo: we also need to bundle all releases that are part of a comp/EP/LP/remix package etc. (you can probably use the ID for this)
+        })
+
+        console.log(uniqueIDs.length)
+
+        return formattedContent
     }
 }
 
