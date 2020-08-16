@@ -74,7 +74,14 @@ async function scraper(conf) {
         log(`finished scraping`)
     }
 
-    return formattedContent
+    if (config.raw) {
+        return formattedContent
+    } else {
+        if (config.logging) {
+            log(`processing scraped data`)
+            // combine the scraped data
+        }
+    }
 }
 
 
