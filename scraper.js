@@ -7,7 +7,7 @@
    check if the selectors in './modules/selectors.js' are still valid. */
 
 
-const { log, updateLog } = require('./modules/logger')
+const { log, error, updateLog } = require('./modules/logger')
 const { padEndSlash, interpolate } = require('./modules/utils')
 const { html, exists, elems, attr } = require('./modules/document')
 const select = require('./modules/selectors')
@@ -36,33 +36,43 @@ module.exports = scraper
 async function scraper(conf) {
     config = conf
 
-    /* Format contentType to usable contentTypeURL,
-       this is to allow users to specify 'featured' instead of '' as config.contentType */
-    config.contentTypeURL = (config.contentType === "featured") ? "" : config.contentType
-
-
     if (config.logging) {
         log(`starting scraping`)
     }
 
-    // Traverse Beatport account and get HTML of all pages
-    const HTMLPages = await getPages()
+    const accIsLabel = config.accountURL.includes('https://www.beatport.com/label') ? true : false
+    const accContentTabs = accIsLabel ? ["tracks", "releases"] : ["tracks", "releases", "charts"]
 
-    if (config.logging) {
-        log(`found ${HTMLPages.length} ${HTMLPages.length > 1 ? "pages" : "page"}`)
-    }
+    const content = await Promise.allSettled(
+        accContentTabs.map(async contentType => {
 
-    // Scrape content of HTML pages
-    const dataArr = await getData(HTMLPages)
+            // Traverse Beatport account and get HTML of all contentType pages
+            const HTMLPages = await getPages(contentType)
 
-    // Sanitize data to get rid of repsonse objects from cheerio/node-fetch
-    const data = await sanitizeData(dataArr)
+            if (config.logging) {
+                log(`found ${HTMLPages.length} ${HTMLPages.length > 1 ? "pages" : "page"} in the ${contentType} section`)
+            }
+
+            // Get JSON from page HTML
+            const rawJSON = await getData(HTMLPages)
+
+            // Get rid of response objects/data and transform JSON to JS object
+            const data = await sanitizeData(rawJSON)
+
+            const contentObj = {
+                type: contentType,
+                data
+            }
+
+            return contentObj
+        })
+    )
 
     if (config.logging) {
         log(`finished scraping`)
     }
 
-    return data
+    return content
 }
 
 
@@ -70,12 +80,13 @@ async function scraper(conf) {
 
 /**
  * Get HTML pages that need to be scraped 
+ * @param {string} contentType - Type of content to scrape 
  * @returns {string[]} - Stringified HTML pages
  */
 
-async function getPages() {
+async function getPages(contentType) {
     // Get first page HTML to analyse for pagination
-    const pageBaseURL = getBaseURL()
+    const pageBaseURL = getBaseURL(contentType)
     const firstPageURL = pageBaseURL + 1
     const firstPageHTML = await html(firstPageURL)
     const hasPagination = exists(select.paginationContainer, firstPageHTML)
@@ -104,13 +115,14 @@ async function getPages() {
 
 /**
  * Get base URL of web page to scrape for content
+ * @param {string} contentType - Type of content to scrape 
  * @returns {string} - Beatport account content base URL
  */
 
-function getBaseURL() {
+function getBaseURL(contentType) {
     const baseURL = padEndSlash(config.accountURL)
     const pageQuery = '?page='
-    const pageURL = baseURL + config.contentTypeURL + pageQuery
+    const pageURL = baseURL + contentType + pageQuery
 
     return pageURL
 }
