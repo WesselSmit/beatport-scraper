@@ -7,7 +7,7 @@
    check if the selectors in './modules/selectors.js' are still valid. */
 
 
-const { log, error, updateLog } = require('./modules/logger')
+const { log, updateLog } = require('./modules/logger')
 const { padEndSlash, interpolate } = require('./modules/utils')
 const { html, exists, elems, attr } = require('./modules/document')
 const select = require('./modules/selectors')
