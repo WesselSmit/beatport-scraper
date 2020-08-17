@@ -10,31 +10,27 @@ $ npm i beatport-scraper
 
 ## Usage
 
-This scraper gets data from a **artist** or **label** Beatport account, it requires `config` options to work.
+This scraper gets data from an **artist** or **label** Beatport account.
 
-* `accountURL` string: URL of Beatport account to scrape. **(required)**
-* `contentType` string: Type of content to scrape, acceptable values are: `featured`, `tracks`, `releases` and `charts`. **(required)**
-* `logging` boolean: Log progress in console. **(optional)**
-
-**Note**
-
-Beatport **label** accounts don't have a `charts` tab, so scraping them will result in a JS object with empty values.
+* `url` string: URL of Beatport account to scrape. **(required)**
+* `log` boolean: Log progress in console. **(defaults to false)**
+* `raw` boolean: Return data unformatted. **(defaults to false)**
 
 ### Example
 
-The code scrapes all data from the `tracks` pages of Seven Lions's Beatport account.
+The example scrapes all data from Seven Lions's Beatport account.
 
 ```js
-const scraper = require('beatport-scraper')
+const scrape = require('beatport-scraper')
 
 const config = {
-    accountURL: 'https://www.beatport.com/artist/seven-lions/241780',
-    contentType: 'tracks',
-    logging: true
+    url: 'https://www.beatport.com/artist/seven-lions/241780',
+    log: true, // optional
+    raw: false // optional
 }
 
-const data = await scraper(config)
-console.log(data)
+scrape(config)
+    .then(data => console.log(data))
 ```
 
 ## Disclaimer
