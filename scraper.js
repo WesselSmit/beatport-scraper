@@ -36,33 +36,56 @@ module.exports = scraper
 async function scraper(conf) {
     config = conf
 
-    /* Format contentType to usable contentTypeURL,
-       this is to allow users to specify 'featured' instead of '' as config.contentType */
-    config.contentTypeURL = (config.contentType === "featured") ? "" : config.contentType
-
-
-    if (config.logging) {
+    if (config.log) {
         log(`starting scraping`)
     }
 
-    // Traverse Beatport account and get HTML of all pages
-    const HTMLPages = await getPages()
+    const accIsLabel = config.url.includes('https://www.beatport.com/label') ? true : false
+    const accContentTabs = accIsLabel ? ["tracks", "releases"] : ["tracks", "releases", "charts"]
 
-    if (config.logging) {
-        log(`found ${HTMLPages.length} ${HTMLPages.length > 1 ? "pages" : "page"}`)
-    }
+    const content = await Promise.allSettled(
+        accContentTabs.map(async contentType => {
 
-    // Scrape content of HTML pages
-    const dataArr = await getData(HTMLPages)
+            // Traverse Beatport account and get HTML of all contentType pages
+            const HTMLPages = await getPages(contentType)
 
-    // Sanitize data to get rid of repsonse objects from cheerio/node-fetch
-    const data = await sanitizeData(dataArr)
+            if (config.log) {
+                log(`found ${HTMLPages.length} ${HTMLPages.length > 1 ? "pages" : "page"} in the ${contentType} section`)
+            }
 
-    if (config.logging) {
+            // Get JSON from page HTML
+            const rawJSON = await getData(HTMLPages)
+
+            // Get rid of response objects/data and transform JSON to JS object
+            const data = await sanitizeData(rawJSON)
+
+            const contentObj = {
+                type: contentType,
+                data
+            }
+
+            return contentObj
+        })
+    )
+
+    const formattedContent = formatData(content)
+
+    if (config.log) {
         log(`finished scraping`)
     }
 
-    return data
+    if (config.raw) {
+        return formattedContent
+    } else {
+        if (config.log) {
+            log(`processing scraped data`)
+        }
+
+        // Combine track and release data into a more convenient format
+        const mergedData = mergeTracksAndReleases(formattedContent)
+
+        return mergedData
+    }
 }
 
 
@@ -70,12 +93,13 @@ async function scraper(conf) {
 
 /**
  * Get HTML pages that need to be scraped 
+ * @param {string} contentType - Type of content to scrape 
  * @returns {string[]} - Stringified HTML pages
  */
 
-async function getPages() {
+async function getPages(contentType) {
     // Get first page HTML to analyse for pagination
-    const pageBaseURL = getBaseURL()
+    const pageBaseURL = getBaseURL(contentType)
     const firstPageURL = pageBaseURL + 1
     const firstPageHTML = await html(firstPageURL)
     const hasPagination = exists(select.paginationContainer, firstPageHTML)
@@ -104,13 +128,14 @@ async function getPages() {
 
 /**
  * Get base URL of web page to scrape for content
+ * @param {string} contentType - Type of content to scrape 
  * @returns {string} - Beatport account content base URL
  */
 
-function getBaseURL() {
-    const baseURL = padEndSlash(config.accountURL)
+function getBaseURL(contentType) {
+    const baseURL = padEndSlash(config.url)
     const pageQuery = '?page='
-    const pageURL = baseURL + config.contentTypeURL + pageQuery
+    const pageURL = baseURL + contentType + pageQuery
 
     return pageURL
 }
@@ -162,7 +187,7 @@ async function getData(HTMLPages) {
             const endJSONIndicator = "window.Sliders =" //! Subject to change
             const json = js.split(startJSONIndicator)[1].split(endJSONIndicator)[0]
 
-            if (config.logging) {
+            if (config.log) {
                 const isLast = (i === HTMLPages.length - 1) ? true : false
                 updateLog(`done scraping page ${i + 1}/${HTMLPages.length}`, isLast)
             }
@@ -199,4 +224,78 @@ async function sanitizeData(dataArr) {
     const sanitizedData = mergedData.map(json => json.value)
 
     return sanitizedData
+}
+
+
+
+
+/**
+ * Format data to get rid of unnecesary nesting
+ * @param {object[]} content - Data to be formatted
+ * @returns {object[]} - Formatted data
+ */
+
+function formatData(content) {
+    const formattedData = content.map(contentObj => {
+        const type = contentObj.value.type
+        const data = contentObj.value.data
+
+        const deNestedObj = data.map(cluster => cluster[type])
+        const flattenedObj = deNestedObj.flat()
+
+        const obj = {
+            [type]: flattenedObj
+        }
+
+        return obj
+    })
+
+    return formattedData
+}
+
+
+
+
+/**
+ * Merges tracks and releases data into one object per release (charts remain the same)
+ * @param {object[]} content - Data to merge
+ * @returns {object[]} - Merged tracks and releases data 
+ */
+
+function mergeTracksAndReleases(content) {
+    const tracks = content[0].tracks
+    const releases = content[1].releases
+
+    /* Some releases are part of compilations/EP/LP/remixes/bundles etc,
+       they are bundled into an array containing all individual releases.
+       To do this the release.id and track.release.id are used to identify unique Beatport releases.
+        */
+
+    const mergedData = releases.map(release => {
+        const id = release.id
+        const associatedTracks = tracks.filter(track => track.release.id === id)
+        const isSingleRelease = associatedTracks.length === 1 ? true : false
+
+        release.is_single = isSingleRelease
+        if (!isSingleRelease) {
+            release.sub_releases = associatedTracks
+        }
+
+        return release
+    })
+
+    const releaseData = {
+        releases: mergedData
+    }
+
+    const charts = content[2]
+    if (charts != undefined) {
+        releaseData.charts = charts.charts
+    }
+
+    if (config.log) {
+        log(`finished processing`)
+    }
+
+    return releaseData
 }
