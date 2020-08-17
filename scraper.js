@@ -36,11 +36,11 @@ module.exports = scraper
 async function scraper(conf) {
     config = conf
 
-    if (config.logging) {
+    if (config.log) {
         log(`starting scraping`)
     }
 
-    const accIsLabel = config.accountURL.includes('https://www.beatport.com/label') ? true : false
+    const accIsLabel = config.url.includes('https://www.beatport.com/label') ? true : false
     const accContentTabs = accIsLabel ? ["tracks", "releases"] : ["tracks", "releases", "charts"]
 
     const content = await Promise.allSettled(
@@ -49,7 +49,7 @@ async function scraper(conf) {
             // Traverse Beatport account and get HTML of all contentType pages
             const HTMLPages = await getPages(contentType)
 
-            if (config.logging) {
+            if (config.log) {
                 log(`found ${HTMLPages.length} ${HTMLPages.length > 1 ? "pages" : "page"} in the ${contentType} section`)
             }
 
@@ -70,14 +70,14 @@ async function scraper(conf) {
 
     const formattedContent = formatData(content)
 
-    if (config.logging) {
+    if (config.log) {
         log(`finished scraping`)
     }
 
     if (config.raw) {
         return formattedContent
     } else {
-        if (config.logging) {
+        if (config.log) {
             log(`processing scraped data`)
         }
 
@@ -133,7 +133,7 @@ async function getPages(contentType) {
  */
 
 function getBaseURL(contentType) {
-    const baseURL = padEndSlash(config.accountURL)
+    const baseURL = padEndSlash(config.url)
     const pageQuery = '?page='
     const pageURL = baseURL + contentType + pageQuery
 
@@ -187,7 +187,7 @@ async function getData(HTMLPages) {
             const endJSONIndicator = "window.Sliders =" //! Subject to change
             const json = js.split(startJSONIndicator)[1].split(endJSONIndicator)[0]
 
-            if (config.logging) {
+            if (config.log) {
                 const isLast = (i === HTMLPages.length - 1) ? true : false
                 updateLog(`done scraping page ${i + 1}/${HTMLPages.length}`, isLast)
             }
@@ -293,7 +293,7 @@ function mergeTracksAndReleases(content) {
         releaseData.charts = charts.charts
     }
 
-    if (config.logging) {
+    if (config.log) {
         log(`finished processing`)
     }
 
