@@ -289,6 +289,7 @@ function mergeTracksAndReleases(content) {
     }
 
     const charts = content[2]
+    if (charts != undefined) {
         releaseData.charts = charts.charts
     }
 
