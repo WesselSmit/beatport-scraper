@@ -77,50 +77,14 @@ async function scraper(conf) {
     if (config.raw) {
         return formattedContent
     } else {
-
         if (config.logging) {
             log(`processing scraped data`)
         }
 
-        //todo combine the scraped data
+        // Combine track and release data into a more convenient format
+        const mergedData = mergeTracksAndReleases(formattedContent)
 
-        const uniqueIDs = [] // array of unique IDs (this is the same for both 'tracks' and 'releases')
-
-        formattedContent.map((data, i) => {
-
-            if (i === 0) { //tracks
-                const tracks = data.tracks
-                tracks.map((track, j) => {
-                    // console.log(j, track.release.id, track.name)
-
-
-                    const ID = track.release.id
-                    if (!uniqueIDs.includes(ID)) {
-                        uniqueIDs.push(ID)
-                    }
-                })
-            }
-
-            if (i === 1) { //releases
-                const releases = data.releases
-                releases.map((release, j) => {
-                    // console.log(j, release.id, release.name)
-
-
-                    const ID = release.id
-                    if (!uniqueIDs.includes(ID)) {
-                        uniqueIDs.push(ID)
-                    }
-                })
-            }
-
-            //todo: now that you have the uniqueIDs we can combine tracks and releases based on the ID
-            //todo: we also need to bundle all releases that are part of a comp/EP/LP/remix package etc. (you can probably use the ID for this)
-        })
-
-        console.log(uniqueIDs.length)
-
-        return formattedContent
+        return mergedData
     }
 }
 
@@ -287,4 +251,50 @@ function formatData(content) {
     })
 
     return formattedData
+}
+
+
+
+
+/**
+ * Merges tracks and releases data into one object per release (charts remain the same)
+ * @param {object[]} content - Data to merge
+ * @returns {object[]} - Merged tracks and releases data 
+ */
+
+function mergeTracksAndReleases(content) {
+    const tracks = content[0].tracks
+    const releases = content[1].releases
+
+    /* Some releases are part of compilations/EP/LP/remixes/bundles etc,
+       they are bundled into an array containing all individual releases.
+       To do this the release.id and track.release.id are used to identify unique Beatport releases.
+        */
+
+    const mergedData = releases.map(release => {
+        const id = release.id
+        const associatedTracks = tracks.filter(track => track.release.id === id)
+        const isSingleRelease = associatedTracks.length === 1 ? true : false
+
+        release.is_single = isSingleRelease
+        if (!isSingleRelease) {
+            release.sub_releases = associatedTracks
+        }
+
+        return release
+    })
+
+    const releaseData = {
+        releases: mergedData
+    }
+
+    const charts = content[2]
+        releaseData.charts = charts.charts
+    }
+
+    if (config.logging) {
+        log(`finished processing`)
+    }
+
+    return releaseData
 }
