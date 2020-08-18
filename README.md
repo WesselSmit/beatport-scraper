@@ -21,8 +21,8 @@ $ npm i @wesselsmit/beatport-scraper
 This scraper gets data from an **artist** or **label** Beatport account.
 
 * `url` string: URL of Beatport account to scrape. **(required)**
-* `log` boolean: Log progress in console. **(defaults to false)**
-* `raw` boolean: Return data unformatted. **(defaults to false)**
+* `log` boolean: Log progress in console. **(optional, defaults to false)**
+* `raw` boolean: Return data unformatted. **(optional, defaults to false)**
 
 ### Example
 
