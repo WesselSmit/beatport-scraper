@@ -4,8 +4,16 @@ A scraper for music data, using [Beatport](https://www.beatport.com/) as source
 
 ## Installation
 
+Create a `.npmrc` with the line below:
+
+```
+@wesselsmit:registry=https://npm.pkg.github.com
+```
+
+Install the package in the CLI
+
 ```sh
-$ npm i beatport-scraper 
+$ npm i @wesselsmit/beatport-scraper
 ```
 
 ## Usage
@@ -21,7 +29,7 @@ This scraper gets data from an **artist** or **label** Beatport account.
 The example scrapes all data from Seven Lions's Beatport account.
 
 ```js
-const scrape = require('beatport-scraper')
+const scrape = require('@wesselsmit/beatport-scraper')
 
 const config = {
     url: 'https://www.beatport.com/artist/seven-lions/241780',
