@@ -35,6 +35,8 @@ jobs:
       run: |
         npm ci
         npm config set //registry=https://npm.pkg.github.com/@wesselsmit
-        npm publish
+        npm config set scope "@wesselsmit"
+        npm config list
+        npm publish --access public 
       env:
         NODE_AUTH_TOKEN: ${{ secrets.GH_AUTH_TOKEN }}
