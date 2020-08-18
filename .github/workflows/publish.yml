@@ -20,8 +20,8 @@ jobs:
       - run: npm publish --access public 
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-
-  publish-gpr:
+          
+ publish-gpr:
   runs-on: ubuntu-latest
   steps:
     - uses: actions/checkout@v1
@@ -30,6 +30,7 @@ jobs:
         node-version: 12
         registry-url: https://npm.pkg.github.com/
         scope: '@wesselsmit'
+    - name: Publish to GPR
     - run: npm ci
     - run: echo registry=https://npm.pkg.github.com/wesselsmit >> .npmrc
     - run: npm publish
