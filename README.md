@@ -41,7 +41,8 @@ This scraper gets data from an **artist** or **label** Beatport account.
 The example scrapes all data from Seven Lions's Beatport account.
 
 ```js
-const scrape = require('@wesselsmit/beatport-scraper')
+const scrape = require('@wesselsmit/beatport-scraper') // using gpr
+const scrape = require('beatport-scraper') // using npm or yarn
 
 const config = {
     url: 'https://www.beatport.com/artist/seven-lions/241780',
