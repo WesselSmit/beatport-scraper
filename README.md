@@ -4,6 +4,18 @@ A scraper for music data, using [Beatport](https://www.beatport.com/) as source
 
 ## Installation
 
+The package is available on `npm`, `yarn` and `gpr` (github package registry). 
+
+### NPM & Yarn
+
+```sh
+$ npm i beatport-scraper # npm
+
+$ yarn add beatport-scraper # yarn
+```
+
+### Github Package Registry
+
 Create a `.npmrc` with the line below:
 
 ```
