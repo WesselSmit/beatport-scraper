@@ -1,6 +1,6 @@
 {
     "name": "beatport-scraper",
-    "version": "3.0.19",
+    "version": "3.0.20",
     "description": "Scraper for Beatport data",
     "keywords": [
         "beatport",
