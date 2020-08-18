@@ -20,7 +20,7 @@ jobs:
       - name: Publish to NPMJS
         run: |
           npm config set //registry.npmjs.org/:_authToken=$NODE_AUTH_TOKEN
-          npm config set scope "wesselsmit"
+          npm config set scope "@wesselsmit"
           npm config list
           npm publish --access public 
         env:
@@ -32,7 +32,7 @@ jobs:
         with:
           node-version: 12
           registry-url: https://npm.pkg.github.com/
-          scope: 'wesselsmit'
+          scope: '@wesselsmit'
       - name: Publish to GitHub Package Registry
         run: npm publish
         env:
