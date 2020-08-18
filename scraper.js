@@ -37,7 +37,7 @@ async function scraper(conf) {
     config = conf
 
     if (config.log) {
-        log(`starting scraping`)
+        log(`started scraping`)
     }
 
     const accIsLabel = config.url.includes('https://www.beatport.com/label') ? true : false
@@ -48,10 +48,6 @@ async function scraper(conf) {
 
             // Traverse Beatport account and get HTML of all contentType pages
             const HTMLPages = await getPages(contentType)
-
-            if (config.log) {
-                log(`found ${HTMLPages.length} ${HTMLPages.length > 1 ? "pages" : "page"} in the ${contentType} section`)
-            }
 
             // Get JSON from page HTML
             const rawJSON = await getData(HTMLPages)
@@ -78,7 +74,7 @@ async function scraper(conf) {
         return formattedContent
     } else {
         if (config.log) {
-            log(`processing scraped data`)
+            log(`started processing`)
         }
 
         // Combine track and release data into a more convenient format
@@ -189,7 +185,7 @@ async function getData(HTMLPages) {
 
             if (config.log) {
                 const isLast = (i === HTMLPages.length - 1) ? true : false
-                updateLog(`done scraping page ${i + 1}/${HTMLPages.length}`, isLast)
+                updateLog(`finished scraping page ${i + 1}/${HTMLPages.length}`, isLast)
             }
 
             return json
