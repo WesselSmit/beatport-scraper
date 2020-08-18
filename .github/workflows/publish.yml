@@ -16,8 +16,9 @@ jobs:
           node-version: 12
           registry-url: https://registry.npmjs.org/
       - name: Publish to NPMJS
-      - run: npm ci
-      - run: npm publish --access public 
+        run: |
+          npm ci
+          npm publish --access public 
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           
@@ -31,8 +32,9 @@ jobs:
         registry-url: https://npm.pkg.github.com/
         scope: '@wesselsmit'
     - name: Publish to GPR
-    - run: npm ci
-    - run: echo registry=https://npm.pkg.github.com/wesselsmit >> .npmrc
-    - run: npm publish
+      run: |
+        npm ci
+        echo registry=https://npm.pkg.github.com/wesselsmit >> .npmrc
+        npm publish
       env:
         NODE_AUTH_TOKEN: ${{ secrets.GH_AUTH_TOKEN }}
