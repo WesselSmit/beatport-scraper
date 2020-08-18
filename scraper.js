@@ -183,11 +183,6 @@ async function getData(HTMLPages) {
             const endJSONIndicator = "window.Sliders =" //! Subject to change
             const json = js.split(startJSONIndicator)[1].split(endJSONIndicator)[0]
 
-            if (config.log) {
-                const isLast = (i === HTMLPages.length - 1) ? true : false
-                updateLog(`finished scraping page ${i + 1}/${HTMLPages.length}`, isLast)
-            }
-
             return json
         })
     )
