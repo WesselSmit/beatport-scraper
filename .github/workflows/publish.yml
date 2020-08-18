@@ -34,7 +34,7 @@ jobs:
     - name: Publish to GPR
       run: |
         npm ci
-        npm config set //registry=https://npm.pkg.github.com/@wesselsmit:_authToken=$NODE_AUTH_TOKEN
+        npm config set //registry=https://npm.pkg.github.com/@wesselsmit
         npm publish
       env:
         NODE_AUTH_TOKEN: ${{ secrets.GH_AUTH_TOKEN }}
